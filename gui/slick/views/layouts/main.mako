@@ -21,7 +21,7 @@
         <meta name="robots" content="noindex, nofollow">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+        <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 
         <% themeColors = { "dark": "#15528F", "light": "#333333" } %>
         <!-- Android -->
@@ -128,13 +128,14 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="${static_url("home/", include_version=False)}" title="SickRage"><img alt="SickRage" src="${static_url('images/sickrage.png')}"
-                                                                                         style="height: 50px;padding: 3px;"
-                                                                                 class="img-responsive pull-left" /></a>
+                    <a class="navbar-brand" href="${static_url("home/", include_version=False)}" title="SickRage">
+                        <img alt="SickRage" src="${static_url('images/sickrage.png')}"
+                             id="nav-img" class="img-responsive pull-left" />
+                    </a>
                 </div>
                 % if srLogin:
                     <div class="collapse navbar-collapse" id="collapsible-navbar">
-                        <ul class="nav navbar-nav navbar-right">
+                        <ul id="nav-menu" class="nav navbar-nav navbar-right">
                             <li id="NAVhome" class="navbar-split dropdown${('', ' active')[topmenu == 'home']}">
                                 <a href="${static_url("home/", include_version=False)}" class="dropdown-toggle" aria-haspopup="true" data-toggle="dropdown" data-hover="dropdown"><span>${_('Shows')}</span>
                                     <b class="caret"></b>
@@ -261,7 +262,7 @@
                 % endif
             </div>
         </nav>
-        <div class="container-fluid">
+        <div class="container-fluid" id="main-container">
             <div id="sub-menu-container" class="row">
                 % if submenu:
                     <div id="sub-menu" class="hidden-print">
