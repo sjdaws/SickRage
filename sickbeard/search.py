@@ -524,12 +524,12 @@ def searchProviders(show, episodes, manualSearch=False, downCurQuality=False):  
             for cur_result in foundResults[curProvider.name][cur_episode]:
                 minSize, maxSize = Quality.getQualitySizes(cur_result.quality)
                 if minSize >= cur_result.size >= maxSize:
-                    foundResults[curProvider.name][cur_episode].remove(cur_result)
+                    del foundResults[curProvider.name][cur_episode][cur_result]
 
         # remove empties
         for cur_episode in foundResults[curProvider.name]:
             if not foundResults[curProvider.name][cur_episode]:
-                foundResults[curProvider.name].remove(cur_episode)
+                del foundResults[curProvider.name][cur_episode]
 
         # check list again
         if not foundResults[curProvider.name]:
