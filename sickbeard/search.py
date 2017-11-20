@@ -234,6 +234,9 @@ def pickBestResult(results, show):  # pylint: disable=too-many-branches
                                                                            cur_result.provider.name):
                 logger.log(cur_result.name + " has previously failed, rejecting it")
                 continue
+        else:
+            logger.log('Size is unknown, skipping')
+            continue
 
         if not bestResult:
             bestResult = cur_result
@@ -516,22 +519,6 @@ def searchProviders(show, episodes, manualSearch=False, downCurQuality=False):  
                 search_mode = 'sponly'
 
         # skip to next provider if we have no results to process
-        if not foundResults[curProvider.name]:
-            continue
-
-        # filter sizes
-        for cur_episode in foundResults[curProvider.name]:
-            for cur_result in foundResults[curProvider.name][cur_episode]:
-                minSize, maxSize = Quality.getQualitySizes(cur_result.quality)
-                if minSize >= cur_result.size >= maxSize:
-                    del foundResults[curProvider.name][cur_episode][cur_result]
-
-        # remove empties
-        for cur_episode in foundResults[curProvider.name]:
-            if not foundResults[curProvider.name][cur_episode]:
-                del foundResults[curProvider.name][cur_episode]
-
-        # check list again
         if not foundResults[curProvider.name]:
             continue
 
