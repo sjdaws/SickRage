@@ -184,6 +184,48 @@ class Quality(object):
         UHD_8K_BLURAY: "8K UHD BluRay",
     })
 
+    qualityMinSizes = NumDict({
+        None: 52428800,
+        NONE: 52428800,
+        UNKNOWN: 52428800,
+        SDTV: 52428800,
+        SDDVD: 52428800,
+        HDTV: 78643200,
+        RAWHDTV: 104857600,
+        FULLHDTV: 104857600,
+        HDWEBDL: 78643200,
+        FULLHDWEBDL: 104857600,
+        HDBLURAY: 78643200,
+        FULLHDBLURAY: 104857600,
+        UHD_4K_TV: 209715200,
+        UHD_8K_TV: 262144000,
+        UHD_4K_WEBDL: 209715200,
+        UHD_8K_WEBDL: 262144000,
+        UHD_4K_BLURAY: 209715200,
+        UHD_8K_BLURAY: 262144000,
+    })
+
+    qualityMaxSizes = NumDict({
+        None: 314572800,
+        NONE: 314572800,
+        UNKNOWN: 314572800,
+        SDTV: 524288000,
+        SDDVD: 524288000,
+        HDTV: 786432000,
+        RAWHDTV: 1048576000,
+        FULLHDTV: 1048576000,
+        HDWEBDL: 786432000,
+        FULLHDWEBDL: 1048576000,
+        HDBLURAY: 786432000,
+        FULLHDBLURAY: 1048576000,
+        UHD_4K_TV: 2097152000,
+        UHD_8K_TV: 2621440000,
+        UHD_4K_WEBDL: 2097152000,
+        UHD_8K_WEBDL: 2621440000,
+        UHD_4K_BLURAY: 2097152000,
+        UHD_8K_BLURAY: 2621440000,
+    })
+
     combinedQualityStrings = NumDict({
         ANYHDTV: "HDTV",
         ANYWEBDL: "WEB-DL",
@@ -249,6 +291,12 @@ class Quality(object):
         if preferred_qualities:
             best_quality = reduce(operator.or_, preferred_qualities)
         return any_quality | (best_quality << 16)
+
+    @staticmethod
+    def getQualitySizes(quality):
+        if quality in Quality.qualityMinSizes:
+            return Quality.qualityMinSizes.get(quality), Quality.qualityMaxSizes.get(quality)
+        return -1, -1
 
     @staticmethod
     def splitQuality(quality):

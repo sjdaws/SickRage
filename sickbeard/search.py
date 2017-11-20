@@ -223,6 +223,13 @@ def pickBestResult(results, show):  # pylint: disable=too-many-branches
             continue
 
         if hasattr(cur_result, 'size'):
+            minSize, maxSize = Quality.getQualitySizes(cur_result.quality)
+            if cur_result.size < minSize or cur_result.size > maxSize:
+                logger.log('Size for quality invalid, size is {} MB. Min allowed is {} MB, max allowed is {} MB'.format(cur_result.size/(1024*1024),
+                                                                              minSize/(1024*1024),
+                                                                              maxSize/(1024*1024)))
+                continue
+
             if sickbeard.USE_FAILED_DOWNLOADS and failed_history.hasFailed(cur_result.name, cur_result.size,
                                                                            cur_result.provider.name):
                 logger.log(cur_result.name + " has previously failed, rejecting it")
@@ -266,6 +273,8 @@ def isFinalResult(result):
     show_obj = result.episodes[0].show
 
     any_qualities, best_qualities = Quality.splitQuality(show_obj.quality)
+
+    # check result size
 
     # if there is a re-download that's higher than this then we definitely need to keep looking
     if best_qualities and result.quality < max(best_qualities):
@@ -495,7 +504,6 @@ def searchProviders(show, episodes, manualSearch=False, downCurQuality=False):  
                         foundResults[curProvider.name][curEp] += searchResults[curEp]
                     else:
                         foundResults[curProvider.name][curEp] = searchResults[curEp]
-
                 break
             elif not curProvider.search_fallback or searchCount == 2:
                 break
@@ -508,6 +516,22 @@ def searchProviders(show, episodes, manualSearch=False, downCurQuality=False):  
                 search_mode = 'sponly'
 
         # skip to next provider if we have no results to process
+        if not foundResults[curProvider.name]:
+            continue
+
+        # filter sizes
+        for cur_episode in foundResults[curProvider.name]:
+            for cur_result in foundResults[curProvider.name][cur_episode]:
+                minSize, maxSize = Quality.getQualitySizes(cur_result.quality)
+                if minSize >= cur_result.size >= maxSize:
+                    foundResults[curProvider.name][cur_episode].remove(cur_result)
+
+        # remove empties
+        for cur_episode in foundResults[curProvider.name]:
+            if not foundResults[curProvider.name][cur_episode]:
+                foundResults[curProvider.name].remove(cur_episode)
+
+        # check list again
         if not foundResults[curProvider.name]:
             continue
 
