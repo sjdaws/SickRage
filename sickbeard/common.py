@@ -208,7 +208,7 @@ class Quality(object):
     qualityMaxSizes = NumDict({
         None: 314572800,
         NONE: 314572800,
-        UNKNOWN: 524288000,
+        UNKNOWN: 1048576000,
         SDTV: 786432000,
         SDDVD: 786432000,
         HDTV: 943718400,
