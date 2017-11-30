@@ -358,6 +358,7 @@ class TVCache(object):
             cur_quality = int(cur_result[b"quality"])
             cur_release_group = cur_result[b"release_group"]
             cur_version = cur_result[b"version"]
+            cur_size = cur_result[b"size"]
 
             # if the show says we want that episode then add it to the list
             if not show_obj.wantEpisode(cur_season, cur_ep, cur_quality, manualSearch, downCurQuality):
@@ -380,6 +381,7 @@ class TVCache(object):
             result.release_group = cur_release_group
             result.version = cur_version
             result.content = None
+            result.size = cur_size
 
             # add it to the list
             if ep_obj not in needed_eps:
