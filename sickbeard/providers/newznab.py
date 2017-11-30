@@ -356,9 +356,7 @@ class NewznabProvider(NZBProvider):  # pylint: disable=too-many-instance-attribu
                                 item_size = size_regex.group() if size_regex else -1
                             else:
                                 item_size = item.size.get_text(strip=True) if item.size else -1
-                                logger.log("item_size is {}".format(item_size))
                                 for attr in item('newznab:attr') + item('torznab:attr'):
-                                    logger.log("attribute found [{}] with value [{}]".format(attr['name'], attr['value']))
                                     item_size = attr['value'] if attr['name'] == 'size' else item_size
                                     seeders = try_int(attr['value']) if attr['name'] == 'seeders' else seeders
                                     leechers = try_int(attr['value']) if attr['name'] == 'peers' else leechers
@@ -366,9 +364,7 @@ class NewznabProvider(NZBProvider):  # pylint: disable=too-many-instance-attribu
                             if not item_size or (torznab and (seeders is None or leechers is None)):
                                 continue
 
-                            logger.log("pre conversation size is {}".format(item_size))
                             size = convert_size(item_size) or -1
-                            logger.log("post conversion is {}".format(size))
 
                             result = {'title': title, 'link': download_url, 'size': size, 'seeders': seeders, 'leechers': leechers}
                             items.append(result)
@@ -391,5 +387,4 @@ class NewznabProvider(NZBProvider):  # pylint: disable=too-many-instance-attribu
         Gets size info from a result item
         Returns int size or -1
         """
-        logger.log("Using _get_size on {}".format(item.get('size', -1)))
         return try_int(item.get('size', -1), -1)
