@@ -58,6 +58,10 @@ class CacheDBConnection(db.DBConnection):
             if not self.hasColumn(provider_name, 'version'):
                 self.addColumn(provider_name, 'version', "NUMERIC", "-1")
 
+            # add size column to table if missing
+            if not self.hasColumn(provider_name, 'size'):
+                self.addColumn(provider_name, 'size', "NUMERIC", "-1")
+
         except Exception as e:
             if str(e) != "table [" + provider_name + "] already exists":
                 raise
@@ -93,6 +97,9 @@ class TVCache(object):
 
     def _get_title_and_url(self, item):
         return self.provider._get_title_and_url(item)  # pylint:disable=protected-access
+
+    def _get_size(self, item):
+        return self.provider._get_size(item) # pylint:disable=protected-access
 
     def _get_rss_data(self):
         return {'entries': self.provider.search(self.search_params)} if self.search_params else None
@@ -155,7 +162,7 @@ class TVCache(object):
             url = self._translate_link_url(url)
 
             # logger.log(u"Attempting to add item to cache: " + title, logger.DEBUG)
-            return self._add_cache_entry(title, url)
+            return self._add_cache_entry(title, url, size=self._get_size(item))
 
         else:
             logger.log(
@@ -195,7 +202,7 @@ class TVCache(object):
     def set_last_update(self, to_date=None):
         """
         Sets the last update date for the current provider in the cache database
-        
+
         :param to_date: date to set to, or None for today
         """
         if not to_date:
@@ -239,7 +246,7 @@ class TVCache(object):
 
         return True
 
-    def _add_cache_entry(self, name, url, parse_result=None, indexer_id=0):
+    def _add_cache_entry(self, name, url, parse_result=None, indexer_id=0, size=-1):
 
         # check if we passed in a parsed result or should we try and create one
         if not parse_result:
@@ -283,8 +290,8 @@ class TVCache(object):
             logger.log("Added RSS item: [" + name + "] to cache: [" + self.provider_id + "]", logger.DEBUG)
 
             return [
-                "INSERT OR IGNORE INTO [" + self.provider_id + "] (name, season, episodes, indexerid, url, time, quality, release_group, version) VALUES (?,?,?,?,?,?,?,?,?)",
-                [name, season, episode_text, parse_result.show.indexerid, url, cur_timestamp, quality, release_group, version]]
+                "INSERT OR IGNORE INTO [" + self.provider_id + "] (name, season, episodes, indexerid, url, time, quality, release_group, version, size) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                [name, season, episode_text, parse_result.show.indexerid, url, cur_timestamp, quality, release_group, version, size]]
 
     def search_cache(self, episode, manual_search=False, down_cur_quality=False):
         needed_eps = self.find_needed_episodes(episode, manual_search, down_cur_quality)
