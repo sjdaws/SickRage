@@ -199,7 +199,7 @@ class NewznabProvider(NZBProvider):  # pylint: disable=too-many-instance-attribu
             'NZBFinder.ws|https://nzbfinder.ws/||5030,5040,5010,5045|0|eponly|1|1|1!!!' + \
             'NZBGeek|https://api.nzbgeek.info/||5030,5040|0|eponly|0|0|0!!!' + \
             'NZBs.org|https://nzbs.org/||5030,5040|0|eponly|0|0|0!!!' + \
-            'Usenet-Crawler|https://www.usenet-crawler.com/||5030,5040|0|eponly|0|0|0!!!' + \
+            'Usenet-Crawler|https://api.usenet-crawler.com/||5030,5040|0|eponly|0|0|0!!!' + \
             'DOGnzb|https://api.dognzb.cr/||5030,5040,5060,5070|0|eponly|0|1|1'
 
     def _check_auth(self):
@@ -338,13 +338,13 @@ class NewznabProvider(NZBProvider):  # pylint: disable=too-many-instance-attribu
                             title = item.title.get_text(strip=True)
                             download_url = None
                             if item.link:
-                                if validators.url(item.link.get_text(strip=True), require_tld=False):
+                                if validators.url(item.link.get_text(strip=True)):
                                     download_url = item.link.get_text(strip=True)
-                                elif validators.url(item.link.next.strip(), require_tld=False):
+                                elif validators.url(item.link.next.strip()):
                                     download_url = item.link.next.strip()
 
                             if (not download_url, item.enclosure and
-                                    validators.url(item.enclosure.get('url', '').strip(), require_tld=False)):
+                                    validators.url(item.enclosure.get('url', '').strip())):
                                 download_url = item.enclosure.get('url', '').strip()
 
                             if not (title and download_url):
