@@ -272,8 +272,6 @@ def isFinalResult(result):
 
     any_qualities, best_qualities = Quality.splitQuality(show_obj.quality)
 
-    # check result size
-
     # if there is a re-download that's higher than this then we definitely need to keep looking
     if best_qualities and result.quality < max(best_qualities):
         return False
