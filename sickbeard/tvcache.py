@@ -203,7 +203,7 @@ class TVCache(object):
     def set_last_update(self, to_date=None):
         """
         Sets the last update date for the current provider in the cache database
-        
+
         :param to_date: date to set to, or None for today
         """
         if not to_date:
