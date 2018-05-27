@@ -60,8 +60,8 @@ class CacheDBConnection(db.DBConnection):
                 self.add_column(provider_name, 'version', "NUMERIC", "-1")
 
             # add size column to table if missing
-            if not self.hasColumn(provider_name, 'size'):
-                self.addColumn(provider_name, 'size', "NUMERIC", "-1")
+            if not self.has_column(provider_name, 'size'):
+                self.add_column(provider_name, 'size', "NUMERIC", "-1")
 
         except Exception as e:
             if str(e) != "table [" + provider_name + "] already exists":
