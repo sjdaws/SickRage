@@ -1,22 +1,22 @@
 # coding=utf-8
 # Author: Nic Wolfe <nic@wolfeden.ca>
 # Rewrite: Dustyn Gibson (miigotu) <miigotu@gmail.com>
-# URL: https://sickrage.github.io
+# URL: https://sickchill.github.io
 #
-# This file is part of SickRage.
+# This file is part of SickChill.
 #
-# SickRage is free software: you can redistribute it and/or modify
+# SickChill is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# SickRage is distributed in the hope that it will be useful,
+# SickChill is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with SickRage. If not, see <http://www.gnu.org/licenses/>.
+# along with SickChill. If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
 
@@ -31,9 +31,9 @@ import sickbeard
 from sickbeard import logger, tvcache
 from sickbeard.bs4_parser import BS4Parser
 from sickbeard.common import cpu_presets
-from sickrage.helper.common import convert_size, try_int
-from sickrage.helper.encoding import ek, ss
-from sickrage.providers.nzb.NZBProvider import NZBProvider
+from sickchill.helper.common import convert_size, try_int
+from sickchill.helper.encoding import ek, ss
+from sickchill.providers.nzb.NZBProvider import NZBProvider
 
 
 class NewznabProvider(NZBProvider):  # pylint: disable=too-many-instance-attributes, too-many-arguments
@@ -174,6 +174,11 @@ class NewznabProvider(NZBProvider):  # pylint: disable=too-many-instance-attribu
             return False, return_categories, error_string
 
         with BS4Parser(data, 'html5lib') as html:
+            try:
+                self.torznab = html.find('server').get('title') == 'Jackett'
+            except AttributeError:
+                self.torznab = False
+
             if not html.find('categories'):
                 error_string = 'Error parsing caps xml for [{0}]'.format(self.name)
                 logger.log(error_string, logger.DEBUG)
@@ -199,7 +204,7 @@ class NewznabProvider(NZBProvider):  # pylint: disable=too-many-instance-attribu
             'NZBFinder.ws|https://nzbfinder.ws/||5030,5040,5010,5045|0|eponly|1|1|1!!!' + \
             'NZBGeek|https://api.nzbgeek.info/||5030,5040|0|eponly|0|0|0!!!' + \
             'NZBs.org|https://nzbs.org/||5030,5040|0|eponly|0|0|0!!!' + \
-            'Usenet-Crawler|https://api.usenet-crawler.com/||5030,5040|0|eponly|0|0|0!!!' + \
+            'Usenet-Crawler|https://usenet-crawler.com/||5030,5040|0|eponly|0|0|0!!!' + \
             'DOGnzb|https://api.dognzb.cr/||5030,5040,5060,5070|0|eponly|0|1|1'
 
     def _check_auth(self):
@@ -311,6 +316,10 @@ class NewznabProvider(NZBProvider):  # pylint: disable=too-many-instance-attribu
                 if mode == 'Season':
                     search_params.pop('ep', '')
 
+            if self.torznab:
+                search_params.pop('ep', '')
+                search_params.pop('season', '')
+
             items = []
             logger.log('Search Mode: {0}'.format(mode), logger.DEBUG)
             for search_string in search_strings[mode]:
@@ -330,10 +339,10 @@ class NewznabProvider(NZBProvider):  # pylint: disable=too-many-instance-attribu
                     if not self._check_auth_from_data(html):
                         break
 
-                    try:
-                        self.torznab = 'xmlns:torznab' in html.rss.attrs
-                    except AttributeError:
-                        self.torznab = False
+                    # try:
+                    #     self.torznab = 'xmlns:torznab' in html.rss.attrs
+                    # except AttributeError:
+                    #     self.torznab = False
 
                     for item in html('item'):
                         try:

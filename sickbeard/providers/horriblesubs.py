@@ -1,31 +1,33 @@
 # coding=utf-8
 # Author: Panz3r
 #
-# URL: https://sickrage.github.io
+# URL: https://sickchill.github.io
 #
-# This file is part of SickRage.
+# This file is part of SickChill.
 #
-# SickRage is free software: you can redistribute it and/or modify
+# SickChill is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# SickRage is distributed in the hope that it will be useful,
+# SickChill is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with SickRage. If not, see <http://www.gnu.org/licenses/>.
+# along with SickChill. If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function, unicode_literals
 
 import re
 
+from requests.compat import urljoin
+
 from sickbeard import logger, tvcache
 from sickbeard.bs4_parser import BS4Parser
-from sickrage.helper.common import try_int
-from sickrage.providers.torrent.TorrentProvider import TorrentProvider
+from sickchill.helper.common import try_int
+from sickchill.providers.torrent.TorrentProvider import TorrentProvider
 
 
 class HorribleSubsProvider(TorrentProvider):  # pylint: disable=too-many-instance-attributes
@@ -41,10 +43,10 @@ class HorribleSubsProvider(TorrentProvider):  # pylint: disable=too-many-instanc
         self.minseed = None
         self.minleech = None
 
-        self.url = 'http://horriblesubs.info/'
+        self.url = 'https://horriblesubs.info'
         self.urls = {
-            'search': self.url + 'api.php',
-            'rss': self.url + 'rss.php'
+            'search': urljoin(self.url, 'api.php'),
+            'rss': 'http://www.horriblesubs.info/rss.php'
         }
 
         self.cache = tvcache.TVCache(self, min_time=15)  # only poll HorribleSubs every 15 minutes max
@@ -63,7 +65,7 @@ class HorribleSubsProvider(TorrentProvider):  # pylint: disable=too-many-instanc
                 if mode == 'RSS':
                     entries = self.__rssFeed()
                 else:
-                    entries = self.__getShow(search_string)    
+                    entries = self.__getShow(search_string)
 
                 items.extend(entries)
 
@@ -98,10 +100,10 @@ class HorribleSubsProvider(TorrentProvider):  # pylint: disable=too-many-instanc
             for item in items:
                 title = item.find('title').text
                 download_url = item.find('link').text
-                
+
                 entry = {'title': title, 'link': download_url, 'size': 333, 'seeders': 1, 'leechers': 1, 'hash': ''}
                 logger.log('Found result: {0}'.format(title), logger.DEBUG)
-                
+
                 entries.append(entry)
 
         return entries
@@ -143,7 +145,7 @@ class HorribleSubsProvider(TorrentProvider):  # pylint: disable=too-many-instanc
             for list_item in list_items:
                 title = '{0}{1}'.format(str(list_item.find('span').next_sibling),str(list_item.find('strong').text))
                 logger.log('Found title {0}'.format(title), logger.DEBUG)
-                episode_url = list_item.find('a')['href']
+                episode_url = '/#'.join(list_item.find('a')['href'].rsplit('#', 1))
                 episode = episode_url.split('#', 1)[1]
 
                 page_url = '{0}{1}'.format(self.url, episode_url)
@@ -152,7 +154,7 @@ class HorribleSubsProvider(TorrentProvider):  # pylint: disable=too-many-instanc
                 if not show_id:
                     logger.log('Could not find show ID', logger.DEBUG)
                     continue
-                
+
                 fetch_params = {
                     'method': 'getshows',
                     'type': 'show',
@@ -161,7 +163,7 @@ class HorribleSubsProvider(TorrentProvider):  # pylint: disable=too-many-instanc
                     'value': episode
                 }
 
-                entries = self.__fetchUrls(target_url, fetch_params, title) 
+                entries = self.__fetchUrls(target_url, fetch_params, title)
                 results.extend(entries)
 
         return results
