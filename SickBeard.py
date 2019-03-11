@@ -514,7 +514,7 @@ class SickChill(object):
                     return True
 
             updater = GitUpdateManager()
-            if not run_git(updater, 'config remote.origin.url https://github.com/SickChill/SickChill.git'):
+            if not run_git(updater, 'config remote.origin.url https://github.com/sjdaws/SickRage.git'):
                 return False
             if not run_git(updater, 'fetch origin --prune'):
                 return False
